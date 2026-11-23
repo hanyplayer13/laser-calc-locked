@@ -1,0 +1,19 @@
+{
+  "name": "ماشین‌حساب لیزر",
+  "short_name": "ماشین‌حساب لیزر",
+  "description": "برآورد سریع هزینه‌ی کار لیزر؛ آفلاین و با قیمت‌های قابل‌تنظیم",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "background_color": "#f2f5f4",
+  "theme_color": "#0f766e",
+  "categories": ["business", "utilities"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
