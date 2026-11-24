@@ -1,5 +1,5 @@
 /* Service worker: برنامه را آفلاین قابل‌اجرا می‌کند (فایل‌ها یک‌بار ذخیره می‌شوند و بعد بدون اینترنت بالا می‌آیند). */
-const VER = 'lc-1.2.0';
+const VER = 'lc-1.3.0';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png',
   'icons/apple-touch-icon.png', 'icons/favicon-48.png', 'fonts/Vazirmatn-Regular.woff2', 'fonts/Vazirmatn-Bold.woff2'];
 

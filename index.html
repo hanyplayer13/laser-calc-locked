@@ -138,14 +138,14 @@ body.lk #main,body.lk #dock,body.lk .top{visibility:hidden}
 </style>
 </head>
 <body>
-<header class="top"><div class="top-in"><img src="icons/icon-192.png" alt=""><h1 id="ttl">ماشین‌حساب لیزر</h1><button id="thm" data-a="theme" aria-label="تغییر حالت شب و روز"></button></div></header>
+<header class="top"><div class="top-in"><img src="icons/icon-192.png" alt=""><h1 id="ttl">ماشین‌حساب لیزر</h1><button id="thm" data-a="theme" aria-label="تغییر حالت شب و روز"></button><button id="ext" data-a="exit" aria-label="خروج از برنامه" title="خروج از برنامه"></button></div></header>
 <main id="main"><noscript>برای کار با این برنامه جاوااسکریپت باید فعال باشد.</noscript></main>
 <div id="dock"><div id="tb"></div><nav id="nav" aria-label="بخش‌ها"></nav></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
 (() => {
 'use strict';
-const APP_VER = '1.2.0';
+const APP_VER = '1.3.0';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const mem = {};
@@ -378,6 +378,7 @@ const rawStore = el => { const v = moneyFmt(el); return v === '' ? '' : String(M
 
 /* ============================ UI helpers ============================ */
 const ICON = {
+  power: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8"/><path d="M6.3 6.6a8 8 0 1 0 11.4 0"/></svg>',
   calc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="2.5" width="15" height="19" rx="2.5"/><path d="M8 6.5h8M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></svg>',
   box: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>',
   tag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>',
@@ -543,7 +544,7 @@ function viewSettings() {
     <button class="dng" data-a="reset" style="width:100%;margin-top:10px">بازگشت به قیمت‌های پیش‌فرض</button></section>
   ${licStatus()}
   <section class="card"><h2>نصب روی گوشی</h2>${installHTML()}</section>
-  <p class="muted" style="text-align:center;font-size:.8em">ماشین‌حساب لیزر — نسخه‌ی ${P.digits === 'en' ? APP_VER : APP_VER.replace(/\d/g, d => FA[d])}<br>محاسبه‌ی هزینه فقط برآورد است و فاکتوری صادر نمی‌شود.</p>`;
+  <p class="muted" style="text-align:center;font-size:.8em">ماشین‌حساب لیزر — نسخه‌ی ${P.digits === 'en' ? APP_VER : APP_VER.replace(/\d/g, d => FA[d])}</p>`;
 }
 function installHTML() {
   if (standalone()) return '<p class="muted" style="margin:0">✓ برنامه نصب شده است و در حالت برنامه اجرا می‌شود.</p>';
@@ -579,7 +580,31 @@ function render() {
   sizeDock();
 }
 function route() { const h = location.hash.slice(1); tab = TABS.some(t => t[0] === h) ? h : 'calc'; render(); window.scrollTo(0, 0); }
-addEventListener('hashchange', route);
+
+/* ============================ back button / exit ============================
+   Switching tabs only rewrites the current history entry (no new entries), so the phone's Back key no longer walks through every tab you visited.
+   The page keeps exactly two entries [base, app]: the first Back lands on "base" and shows a hint, the second Back leaves the app.
+   The extra entry is created from a real tap (browsers skip entries a page adds without user interaction). Nothing is reset: data and activation stay. */
+function backArm() {
+  try { const st = history.state; if (!st || st.lc !== 'app') { history.replaceState({lc: 'base'}, ''); history.pushState({lc: 'app'}, ''); } } catch (e) {}
+}
+['pointerup', 'click', 'keydown'].forEach(ev => addEventListener(ev, backArm, true));
+addEventListener('popstate', () => { const st = history.state; if (st && st.lc === 'base') toast('برای خروج، یک بار دیگر «برگشت» را بزنید'); });
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('#nav a'); if (!a) return;
+  const k = (a.getAttribute('href') || '').slice(1); if (!TABS.some(t => t[0] === k)) return;
+  e.preventDefault();
+  try { history.replaceState(history.state, '', '#' + k); } catch (x) {}
+  route();
+});
+function exitApp() {
+  flush();                                                       // everything is already saved; this just makes sure
+  try { window.close(); } catch (e) {}                           // installed app (Android): closes the window
+  setTimeout(() => {                                             // still here (browser tab / iPhone): fall back to the same hint as the Back key
+    if (document.hidden) return;
+    if (history.state && history.state.lc === 'app') history.back(); else toast('برای بستن برنامه از دکمه‌ی خانه یا لیست برنامه‌های گوشی استفاده کنید');
+  }, 600);
+}
 function sizeDock() { const h = Math.ceil($('#dock').getBoundingClientRect().height); document.documentElement.style.setProperty('--dock-h', h + 'px'); }
 try { new ResizeObserver(sizeDock).observe($('#dock')); } catch (e) {}
 
@@ -628,6 +653,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-a]'); if (!b) return;
   const a = b.dataset.a, d = b.dataset;
   switch (a) {
+    case 'exit': exitApp(); break;
     case 'theme': P.mode = isDark() ? 'light' : 'dark'; applyTheme(); save(); if (tab === 'settings') viewSettings(); break;
     case 'seen': store.set('lc.seen', '1'); $('#intro')?.remove(); break;
     case 'radd': C.rows.push(newRow()); save(); viewCalc(); { const els = $$('#rows .card'); els[els.length - 1]?.scrollIntoView({behavior: 'smooth', block: 'start'}); } break;
@@ -666,7 +692,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ============================ start ============================ */
-load(); applyTheme();
+load(); applyTheme(); $('#ext').innerHTML = ICON.power;
 licGate().then(ok => { if (ok) { route(); licNote(); } });
 /* re-check while the app stays open (expiry day passes, tab restored from memory) */
 document.addEventListener('visibilitychange', () => { if (!document.hidden && LIC_ON && licOK) licGate(); });
