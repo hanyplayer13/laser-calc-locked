@@ -1,0 +1,4 @@
+کتابخانه‌ی اسکن QR
+-----------------
+اسکنر مرورگر از jsQR نسخه‌ی 1.4.0 استفاده می‌کند (Apache License 2.0)، از طریق CDN رسمی jsDelivr: https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js
+مخزن پروژه: https://github.com/cozmo/jsQR

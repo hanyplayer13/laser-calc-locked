@@ -134,18 +134,30 @@ body.lk #main,body.lk #dock,body.lk .top{visibility:hidden}
 #lock .lkm{min-height:1.4em;margin:2px 0 10px;color:var(--danger);font-size:.9em;text-align:center}
 #lock .lkm.ok{color:var(--acc-d)}#lock p{margin:6px 0 12px;font-size:.9em;line-height:1.9}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-@media (min-width:700px){body{font-size:calc(var(--fs) + 1px)}}
+@media (min-width:700px){
+  body{font-size:calc(var(--fs) + 1px)}
+  .top-in,#tb,#nav{max-width:760px}
+  main{max-width:760px;padding:18px 18px calc(var(--dock-h) + 30px)}
+  .card{padding:18px}
+}
+@media (min-width:1000px){
+  .top-in,#tb,#nav{max-width:900px}
+  main{max-width:900px;padding-inline:22px}
+}
 </style>
 </head>
 <body>
-<header class="top"><div class="top-in"><img src="icons/icon-192.png" alt=""><h1 id="ttl">ماشین‌حساب لیزر</h1><button id="thm" data-a="theme" aria-label="تغییر حالت شب و روز"></button><button id="ext" data-a="exit" aria-label="خروج از برنامه" title="خروج از برنامه"></button></div></header>
+<header class="top"><div class="top-in"><img src="icons/icon-192.png" alt=""><h1 id="ttl">ماشین‌حساب لیزر</h1><button id="thm" data-a="theme" aria-label="تغییر حالت شب و روز"></button><button id="qrs" data-a="qrs" aria-label="اسکن QR به‌روزرسانی قیمت‌ها" title="اسکن QR قیمت‌ها">▦</button><button id="ext" data-a="exit" aria-label="خروج از برنامه" title="خروج از برنامه"></button></div></header>
 <main id="main"><noscript>برای کار با این برنامه جاوااسکریپت باید فعال باشد.</noscript></main>
 <div id="dock"><div id="tb"></div><nav id="nav" aria-label="بخش‌ها"></nav></div>
+<div id="qrscan" hidden style="position:fixed;inset:0;z-index:9998;background:var(--bg);padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));overflow:auto">
+  <div style="max-width:560px;margin:0 auto"><div class="card-h"><h2 style="margin:0">اسکن QR قیمت‌ها</h2><button id="qrx" type="button">بستن</button></div><p class="muted" style="font-size:.88em">کد QR نمایش‌داده‌شده در برنامه‌ی اصلی را مقابل دوربین قرار دهید. فقط QR امضاشده‌ی برنامه‌ی اصلی پذیرفته می‌شود.</p><video id="qrv" playsinline muted style="display:block;width:100%;max-height:62vh;object-fit:contain;background:#111;border-radius:12px"></video><p id="qrm" class="hint" role="status">در حال آماده‌سازی دوربین…</p></div>
+</div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
 (() => {
 'use strict';
-const APP_VER = '1.3.0';
+const APP_VER = '1.3.3';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const mem = {};
@@ -468,7 +480,7 @@ function viewBox() {
   main.innerHTML = `<section class="card"><h2>هزینه‌ی باکس چنلیوم</h2><p class="muted" style="margin:0">فرمول: (طول × عرض) × مبلغ هر متر مربع</p>
     <div class="g2"><label>طول (سانت)${numIn('data-b="l"', C.box.l)}</label><label>عرض (سانت)${numIn('data-b="w"', C.box.w)}</label></div>
     <label>مبلغ هر متر مربع (${uname()})${moneyIn('data-b="p"', priceDisp(C.box.p))}<span class="hint acc" id="bp-t"></span></label><div id="b-res"></div></section>
-  <section class="card"><h2>هزینه‌ی نئون‌پلکسی</h2><p class="muted" style="margin:0">فرمول: متراژ × مبلغ هر متر</p>
+  <section class="card"><h2>هزینه نئون پلکسی و حروف چنلیوم</h2><p class="muted" style="margin:0">فرمول: متراژ × مبلغ هر متر</p>
     <label>متراژ (متر)${numIn('data-n="m"', C.neon.m)}</label>
     <label>مبلغ هر متر (${uname()})${moneyIn('data-n="p"', priceDisp(C.neon.p))}<span class="hint acc" id="np-t"></span></label><div id="n-res"></div></section>`;
   updSide();
@@ -478,7 +490,7 @@ function updSide() {
   $('#bp-t').textContent = bp > 0 ? `${money2(bp)} ${uother()}` : '';
   $('#b-res').innerHTML = `<div class="hint" style="margin-top:6px">مساحت: ${fmt(+b.area.toFixed(4), 4)} متر مربع</div>` + res(b.cost, 'هزینه‌ی باکس');
   $('#np-t').textContent = np > 0 ? `${money2(np)} ${uother()}` : '';
-  $('#n-res').innerHTML = res(n, 'هزینه‌ی نئون‌پلکسی');
+  $('#n-res').innerHTML = res(n, 'هزینه نئون پلکسی و حروف چنلیوم');
 }
 
 /* ============================ prices tab ============================ */
@@ -570,6 +582,99 @@ function importText(text) {
   fixRefs(); flush(); applyTheme(); render(); toast('قیمت‌ها وارد شد');
 }
 
+/* ============================ signed price QR transfer ============================ */
+let qrStream = null, qrFrame = 0, qrBusy = false, qrJsPromise = null;
+function loadQRDecoder() {
+  if (window.jsQR) return Promise.resolve(window.jsQR);
+  if (qrJsPromise) return qrJsPromise;
+  qrJsPromise = new Promise((resolve, reject) => {
+    const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js'; sc.async = true;
+    sc.onload = () => window.jsQR ? resolve(window.jsQR) : reject(new Error('کتابخانه‌ی اسکن QR بارگذاری نشد'));
+    sc.onerror = () => reject(new Error('برای بارگذاری اسکنر QR به اینترنت نیاز است. اتصال اینترنت را بررسی کنید.'));
+    document.head.appendChild(sc);
+  }).catch(err => { qrJsPromise = null; throw err; });
+  return qrJsPromise;
+}
+const B45 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
+function b45decode(s) {
+  if (!s || s.length % 3 === 1) throw new Error('ساختار QR معتبر نیست');
+  const out = []; let i = 0;
+  for (; i + 2 < s.length; i += 3) {
+    const a = B45.indexOf(s[i]), b = B45.indexOf(s[i+1]), c = B45.indexOf(s[i+2]);
+    if (a < 0 || b < 0 || c < 0) throw new Error('ساختار QR معتبر نیست');
+    const n = a + b * 45 + c * 2025; if (n > 65535) throw new Error('داده‌ی QR خراب است');
+    out.push(n >> 8, n & 255);
+  }
+  if (i < s.length) {
+    const a = B45.indexOf(s[i]), b = B45.indexOf(s[i+1]);
+    if (a < 0 || b < 0) throw new Error('ساختار QR معتبر نیست');
+    const n = a + b * 45; if (n > 255) throw new Error('داده‌ی QR خراب است'); out.push(n);
+  }
+  return new Uint8Array(out);
+}
+async function inflatePricePayload(bytes) {
+  if (!('DecompressionStream' in window)) throw new Error('مرورگر این دستگاه فشرده‌گشایی امن را پشتیبانی نمی‌کند؛ مرورگر را به‌روز کنید.');
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate'));
+  return new Response(stream).text();
+}
+async function acceptSignedPriceQR(token) {
+  if (!LIC_ON || !/^[0-9a-f]{130}$/i.test(LIC_PUB)) throw new Error('نسخه‌ی قفل‌دار معتبر برای بررسی امضای QR نصب نشده است.');
+  const code = String(token || '');
+  if (!code.startsWith('LCPR1') || code.length <= 101) throw new Error('این QR متعلق به برنامه‌ی اصلی لیزر نیست.');
+  const body = code.slice(5), packed = b45decode(body.slice(0, -96)), sig = b45decode(body.slice(-96));
+  if (sig.length !== 64 || packed.length < 8 || packed.length > 200000) throw new Error('اطلاعات QR ناقص یا نامعتبر است.');
+  const key = await crypto.subtle.importKey('raw', hex2b(LIC_PUB), {name:'ECDSA',namedCurve:'P-256'}, false, ['verify']);
+  const msg = new Uint8Array([...new TextEncoder().encode('LCPR1'), ...packed]);
+  const valid = await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'}, key, sig, msg);
+  if (!valid) throw new Error('امضای QR معتبر نیست؛ قیمت‌ها تغییر نکردند.');
+  const json = await inflatePricePayload(packed);
+  let o; try { o = JSON.parse(json); } catch (e) { throw new Error('محتوای QR قابل خواندن نیست.'); }
+  if (!o || o.app !== 'laser-calc' || o.v !== 1 || o.source !== 'laser-invoice') throw new Error('این QR بسته‌ی قیمت معتبر برنامه‌ی اصلی نیست.');
+  const d = sanitizeData(o, D); if (!d) throw new Error('ساختار فهرست قیمت‌ها معتبر نیست.');
+  // Commit only after signature, decompression, JSON and schema validation have all succeeded.
+  D = d; fixRefs(); flush(); render();
+  toast(`${fmt(d.materials.length)} متریال و ${fmt(d.services.length)} خدمت با موفقیت به‌روز شد`);
+}
+function stopQRScan() {
+  cancelAnimationFrame(qrFrame); qrFrame = 0;
+  if (qrStream) { qrStream.getTracks().forEach(t => t.stop()); qrStream = null; }
+  const v = $('#qrv'); if (v) v.srcObject = null;
+  $('#qrscan').hidden = true; qrBusy = false;
+}
+async function startQRScan() {
+  if (qrBusy) return; qrBusy = true;
+  const panel = $('#qrscan'), video = $('#qrv'), msg = $('#qrm'); panel.hidden = false; msg.textContent = 'در حال آماده‌سازی اسکنر…';
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) throw new Error('دسترسی دوربین در این مرورگر فراهم نیست. برنامه را با HTTPS و مرورگر به‌روز باز کنید.');
+    // Request the camera immediately in the click gesture (important for iOS Safari).
+    const cameraPromise = navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
+    const decoderPromise = loadQRDecoder();
+    qrStream = await cameraPromise;
+    const decode = await decoderPromise;
+    video.srcObject = qrStream; await video.play(); msg.textContent = 'دوربین را روبه‌روی QR برنامه‌ی اصلی نگه دارید…';
+    const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d',{willReadFrequently:true});
+    const tick = async () => {
+      if (!qrStream || panel.hidden) return;
+      if (video.readyState >= 2 && video.videoWidth) {
+        const scale = Math.min(1, 900 / video.videoWidth); canvas.width = Math.round(video.videoWidth * scale); canvas.height = Math.round(video.videoHeight * scale);
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        const im = ctx.getImageData(0,0,canvas.width,canvas.height), found = decode(im.data,im.width,im.height,{inversionAttempts:'attemptBoth'});
+        if (found?.data) {
+          stopQRScan();
+          try { await acceptSignedPriceQR(found.data); } catch (err) { toast(err.message || 'QR نامعتبر است'); }
+          return;
+        }
+      }
+      qrFrame = requestAnimationFrame(tick);
+    };
+    qrFrame = requestAnimationFrame(tick);
+  } catch (err) { stopQRScan(); toast(err.message || 'باز کردن دوربین ناموفق بود'); }
+}
+$('#qrs').innerHTML = '▦';
+$('#qrs').addEventListener('click', startQRScan);
+$('#qrx').addEventListener('click', stopQRScan);
+window.addEventListener('pagehide', stopQRScan);
+
 /* ============================ routing & events ============================ */
 function render() {
   if (!licOK) return;
@@ -582,14 +687,35 @@ function render() {
 function route() { const h = location.hash.slice(1); tab = TABS.some(t => t[0] === h) ? h : 'calc'; render(); window.scrollTo(0, 0); }
 
 /* ============================ back button / exit ============================
-   Switching tabs only rewrites the current history entry (no new entries), so the phone's Back key no longer walks through every tab you visited.
-   The page keeps exactly two entries [base, app]: the first Back lands on "base" and shows a hint, the second Back leaves the app.
-   The extra entry is created from a real tap (browsers skip entries a page adds without user interaction). Nothing is reset: data and activation stay. */
+   Tab changes replace the current entry, so Back never walks through visited tabs.
+   The first Back returns to the base entry and shows a hint; a second real Back can leave the app.
+   The Exit button now performs those two history-back steps itself, in sequence. Browsers may still
+   block scripted window closing when there is no previous history entry; in that case we explain the platform limit.
+   Nothing is reset: local data and activation stay on the device. */
 function backArm() {
   try { const st = history.state; if (!st || st.lc !== 'app') { history.replaceState({lc: 'base'}, ''); history.pushState({lc: 'app'}, ''); } } catch (e) {}
 }
+let exitInProgress = false, exitBackCount = 0, exitFallbackTimer = 0;
 ['pointerup', 'click', 'keydown'].forEach(ev => addEventListener(ev, backArm, true));
-addEventListener('popstate', () => { const st = history.state; if (st && st.lc === 'base') toast('برای خروج، یک بار دیگر «برگشت» را بزنید'); });
+addEventListener('popstate', () => {
+  if (exitInProgress) {
+    if (exitBackCount === 1) {
+      exitBackCount = 2;
+      // Wait for the first Back navigation to finish, then perform the second one.
+      setTimeout(() => { if (exitInProgress && exitBackCount === 2) { try { history.back(); } catch (e) {} } }, 100);
+      return;
+    }
+    exitInProgress = false;
+    if (exitFallbackTimer) clearTimeout(exitFallbackTimer);
+    return;
+  }
+  const st = history.state;
+  if (st && st.lc === 'base') toast('برای خروج، یک بار دیگر «برگشت» را بزنید');
+});
+addEventListener('pagehide', () => {
+  exitInProgress = false;
+  if (exitFallbackTimer) clearTimeout(exitFallbackTimer);
+});
 document.addEventListener('click', e => {
   const a = e.target.closest && e.target.closest('#nav a'); if (!a) return;
   const k = (a.getAttribute('href') || '').slice(1); if (!TABS.some(t => t[0] === k)) return;
@@ -598,12 +724,21 @@ document.addEventListener('click', e => {
   route();
 });
 function exitApp() {
-  flush();                                                       // everything is already saved; this just makes sure
-  try { window.close(); } catch (e) {}                           // installed app (Android): closes the window
-  setTimeout(() => {                                             // still here (browser tab / iPhone): fall back to the same hint as the Back key
-    if (document.hidden) return;
-    if (history.state && history.state.lc === 'app') history.back(); else toast('برای بستن برنامه از دکمه‌ی خانه یا لیست برنامه‌های گوشی استفاده کنید');
-  }, 600);
+  if (exitInProgress) return;
+  flush();                                                       // persist current values before leaving
+  exitInProgress = true;
+  exitBackCount = 1;
+  if (!history.state || history.state.lc !== 'app') backArm();   // ensure the first Back has the app's base entry
+  try { window.close(); } catch (e) {}                           // works in some installed-app contexts
+  try { history.back(); } catch (e) {                             // first Back step
+    exitInProgress = false;
+    return toast('مرورگر اجازه‌ی خروج خودکار نمی‌دهد؛ از دکمه‌ی خانه یا فهرست برنامه‌های گوشی استفاده کنید');
+  }
+  exitFallbackTimer = setTimeout(() => {
+    if (!exitInProgress || document.hidden) return;
+    exitInProgress = false;
+    toast('مرورگر اجازه‌ی بستن خودکار را نمی‌دهد؛ از دکمه‌ی خانه یا فهرست برنامه‌های گوشی خارج شوید');
+  }, 1600);
 }
 function sizeDock() { const h = Math.ceil($('#dock').getBoundingClientRect().height); document.documentElement.style.setProperty('--dock-h', h + 'px'); }
 try { new ResizeObserver(sizeDock).observe($('#dock')); } catch (e) {}
