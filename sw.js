@@ -1,5 +1,5 @@
 /* Service worker: برنامه را آفلاین قابل‌اجرا می‌کند (فایل‌ها یک‌بار ذخیره می‌شوند و بعد بدون اینترنت بالا می‌آیند). */
-const VER = 'lc-1.3.3';
+const VER = 'lc-1.3.4';
 const QR_LIB = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png',
   'icons/apple-touch-icon.png', 'icons/favicon-48.png', 'fonts/Vazirmatn-Regular.woff2', 'fonts/Vazirmatn-Bold.woff2'];

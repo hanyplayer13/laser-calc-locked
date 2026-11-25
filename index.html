@@ -147,7 +147,7 @@ body.lk #main,body.lk #dock,body.lk .top{visibility:hidden}
 </style>
 </head>
 <body>
-<header class="top"><div class="top-in"><img src="icons/icon-192.png" alt=""><h1 id="ttl">ماشین‌حساب لیزر</h1><button id="thm" data-a="theme" aria-label="تغییر حالت شب و روز"></button><button id="qrs" data-a="qrs" aria-label="اسکن QR به‌روزرسانی قیمت‌ها" title="اسکن QR قیمت‌ها">▦</button><button id="ext" data-a="exit" aria-label="خروج از برنامه" title="خروج از برنامه"></button></div></header>
+<header class="top"><div class="top-in"><img src="icons/icon-192.png" alt=""><h1 id="ttl">ماشین‌حساب لیزر</h1><button id="thm" data-a="theme" aria-label="تغییر حالت شب و روز"></button><button id="qrs" data-a="qrs" aria-label="اسکن کد QR قیمت‌ها" title="اسکن کد QR قیمت‌ها"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3z"/><path d="M14 14h3v3h-3zM19 14v2M14 19h2M19 19h2v2M17 21v-2"/></svg></button></div></header>
 <main id="main"><noscript>برای کار با این برنامه جاوااسکریپت باید فعال باشد.</noscript></main>
 <div id="dock"><div id="tb"></div><nav id="nav" aria-label="بخش‌ها"></nav></div>
 <div id="qrscan" hidden style="position:fixed;inset:0;z-index:9998;background:var(--bg);padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));overflow:auto">
@@ -788,7 +788,6 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-a]'); if (!b) return;
   const a = b.dataset.a, d = b.dataset;
   switch (a) {
-    case 'exit': exitApp(); break;
     case 'theme': P.mode = isDark() ? 'light' : 'dark'; applyTheme(); save(); if (tab === 'settings') viewSettings(); break;
     case 'seen': store.set('lc.seen', '1'); $('#intro')?.remove(); break;
     case 'radd': C.rows.push(newRow()); save(); viewCalc(); { const els = $$('#rows .card'); els[els.length - 1]?.scrollIntoView({behavior: 'smooth', block: 'start'}); } break;
@@ -827,7 +826,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ============================ start ============================ */
-load(); applyTheme(); $('#ext').innerHTML = ICON.power;
+load(); applyTheme();
 licGate().then(ok => { if (ok) { route(); licNote(); } });
 /* re-check while the app stays open (expiry day passes, tab restored from memory) */
 document.addEventListener('visibilitychange', () => { if (!document.hidden && LIC_ON && licOK) licGate(); });
