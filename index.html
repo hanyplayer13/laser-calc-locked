@@ -29,7 +29,7 @@ try {
 :root{--acc:#0f766e;--acc-h:#0b5a54;--acc-d:#0a4c47;--acc-l:#e3f0ee;--th:#d6e9e6;--on-acc:#fff;--hdr:#0f766e;--on-hdr:#fff;
 --bg:#f2f5f4;--card:#fff;--ink:#1c2528;--muted:#66747a;--line:#dbe2e0;--bd:#c3cecb;--head:#f8faf9;--hover:#eef3f2;
 --warn:#b45309;--warn-l:#fef3e2;--danger:#b42318;--danger-l:#fdecea;--danger-b:#f0c9c5;--r:14px;--fs:16px;--dock-h:120px;
---sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
+--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);--wrap:600px}
 html[data-theme=dark]{color-scheme:dark;--bg:#12181a;--card:#1b2326;--ink:#e5ecea;--muted:#92a3a8;--line:#2f3b3f;--bd:#3d4f54;--head:#1f292c;--hover:#263235;
 --warn:#fbbf24;--warn-l:#3a2d12;--danger:#f87171;--danger-l:#3b1f1e;--danger-b:#5b2a27}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -55,13 +55,13 @@ button:disabled{opacity:.5}
 .hint{display:block;font-size:.78em;color:var(--muted);min-height:1.5em;line-height:1.5}
 .hint.acc{color:var(--acc-d)}
 /* layout */
-.top{background:var(--hdr);color:var(--on-hdr);padding:calc(var(--sat) + 8px) 14px 8px}
-.top-in{max-width:600px;margin:auto;display:flex;align-items:center;gap:10px}
+.top{background:var(--hdr);color:var(--on-hdr);padding:calc(var(--sat) + 8px) calc(14px + var(--sar)) 8px calc(14px + var(--sal))}
+.top-in{max-width:var(--wrap);margin:auto;display:flex;align-items:center;gap:10px}
 .top img{width:30px;height:30px;border-radius:8px;flex:none}
 .top h1{margin:0;font-size:1.15em;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top button{background:rgba(255,255,255,.16);border:0;color:inherit;border-radius:99px;width:40px;height:40px;min-height:0;padding:0;display:grid;place-items:center}
 .top button svg{width:20px;height:20px}
-main{max-width:600px;margin:0 auto;padding:12px 12px calc(var(--dock-h) + 24px)}
+main{max-width:var(--wrap);margin:0 auto;padding:12px max(12px,var(--sar)) calc(var(--dock-h) + 24px) max(12px,var(--sal))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
 .card h2{margin:0 0 8px;font-size:1.05em}
 .card-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
@@ -110,11 +110,11 @@ details.svc[open] summary::after{transform:rotate(180deg)}
 .bar{position:sticky;top:0;z-index:4;background:var(--bg);padding:2px 0 8px}
 /* dock: total bar + tab bar */
 #dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);padding-bottom:var(--sab);box-shadow:0 -4px 16px #0000000f}
-#tb{display:none;max-width:600px;margin:auto;padding:8px 12px;align-items:center;gap:8px}
+#tb{display:none;max-width:var(--wrap);margin:auto;padding:8px 12px;align-items:center;gap:8px}
 #tb.on{display:flex}
 #tb .t{flex:1;min-width:0;line-height:1.3}#tb .t small{color:var(--muted);display:block;font-size:.75em}#tb .t b{font-size:1.15em;color:var(--acc-d)}
 #tb button{padding:6px 14px}
-#nav{display:flex;max-width:600px;margin:auto;border-top:1px solid var(--line)}
+#nav{display:flex;max-width:var(--wrap);margin:auto;border-top:1px solid var(--line)}
 #tb:not(.on)+#nav{border-top:0}
 #nav a{flex:1;text-align:center;text-decoration:none;color:var(--muted);padding:6px 2px 5px;font-size:.72em;line-height:1.3;position:relative}
 #nav a svg{display:block;margin:0 auto 1px;width:24px;height:24px}
@@ -133,31 +133,59 @@ body.lk #main,body.lk #dock,body.lk .top{visibility:hidden}
 #lock textarea{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:max(16px,.95em);direction:ltr;text-align:left;letter-spacing:.03em;margin:4px 0 8px;resize:none}
 #lock .lkm{min-height:1.4em;margin:2px 0 10px;color:var(--danger);font-size:.9em;text-align:center}
 #lock .lkm.ok{color:var(--acc-d)}#lock p{margin:6px 0 12px;font-size:.9em;line-height:1.9}
+/* tablets / landscape: wider page, calculator in two columns (rows | totals), card grids for prices, box+neon side by side, settings in two columns */
+@media (min-width:720px){
+  :root{--wrap:1040px}
+  .cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,1fr);gap:16px;align-items:start}
+  .cols>.c2{position:sticky;top:12px;max-height:calc(100vh - var(--dock-h) - 28px);max-height:calc(100dvh - var(--dock-h) - 28px);overflow:auto;overscroll-behavior:contain}
+  .cols>.c2>.card:last-child{margin-bottom:0}
+  #plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;align-items:start}
+  #plist>.card{margin:0}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .pair>.card{margin:0}
+  .mas{column-count:2;column-gap:16px}
+  .mas>section{break-inside:avoid;-webkit-column-break-inside:avoid}
+  #nav a{font-size:.8em}
+  #toast{max-width:640px}
+}
+@media (min-width:1180px){:root{--wrap:1240px}}
+@media (min-width:1500px){:root{--wrap:1400px}#plist{grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}}
+/* landscape phones / short windows: slim header, icon + label side by side in the tab bar */
+@media (orientation:landscape) and (max-height:520px){
+  .top{padding-top:calc(var(--sat) + 3px);padding-bottom:3px}
+  .top img{width:26px;height:26px}
+  .top button{width:34px;height:34px}
+  .top h1{font-size:1.05em}
+  #nav a{display:flex;align-items:center;justify-content:center;gap:6px;padding:5px 2px;font-size:.82em}
+  #nav a svg{width:20px;height:20px;margin:0}
+  #tb{padding:4px 12px}
+  main{padding-top:8px}
+  .card{padding:10px}
+  #toast{bottom:calc(var(--dock-h) + 6px)}
+}
+#scan{position:fixed;inset:0;z-index:80;background:#000;color:#fff;display:flex;flex-direction:column}
+#scan video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#scan .scf{position:absolute;left:50%;top:42%;width:min(70vw,60vh);aspect-ratio:1;transform:translate(-50%,-50%);border:3px solid rgba(255,255,255,.85);border-radius:16px;box-shadow:0 0 0 100vmax rgba(0,0,0,.45);pointer-events:none}
+#scan .scp{position:absolute;left:0;right:0;bottom:0;padding:14px 16px calc(var(--sab) + 14px);background:rgba(0,0,0,.72);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+#scst{font-size:.95em;line-height:1.7}
+#scan button{background:#fff;color:#111;border:0;border-radius:10px;padding:10px 28px;font-size:1em;min-height:44px}
+#scdots{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:420px}
+#scdots i{width:14px;height:14px;border-radius:4px;background:rgba(255,255,255,.3)}
+#scdots i.on{background:#34d399}
+@media (orientation:landscape) and (max-height:520px){#scan .scf{left:30%;top:50%;width:min(80vh,40vw)}#scan .scp{left:auto;width:42%;top:0;justify-content:center;padding-top:calc(var(--sat) + 10px)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-@media (min-width:700px){
-  body{font-size:calc(var(--fs) + 1px)}
-  .top-in,#tb,#nav{max-width:760px}
-  main{max-width:760px;padding:18px 18px calc(var(--dock-h) + 30px)}
-  .card{padding:18px}
-}
-@media (min-width:1000px){
-  .top-in,#tb,#nav{max-width:900px}
-  main{max-width:900px;padding-inline:22px}
-}
+@media (min-width:700px){body{font-size:calc(var(--fs) + 1px)}}
 </style>
 </head>
 <body>
-<header class="top"><div class="top-in"><img src="icons/icon-192.png" alt=""><h1 id="ttl">ماشین‌حساب لیزر</h1><button id="thm" data-a="theme" aria-label="تغییر حالت شب و روز"></button><button id="qrs" data-a="qrs" aria-label="اسکن کد QR قیمت‌ها" title="اسکن کد QR قیمت‌ها"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="7" height="7" rx=".7"/><rect x="4.5" y="4.5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="14.5" y="2.5" width="7" height="7" rx=".7"/><rect x="16.5" y="4.5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="2.5" y="14.5" width="7" height="7" rx=".7"/><rect x="4.5" y="16.5" width="3" height="3" fill="currentColor" stroke="none"/><path d="M14 14h2v2h-2zM19 14v2m-5 3h2m2-2v4h2m-4 0v-2"/></svg></button></div></header>
+<header class="top"><div class="top-in"><img src="icons/icon-192.png" alt=""><h1 id="ttl">ماشین‌حساب لیزر</h1><button id="thm" data-a="theme" aria-label="تغییر حالت شب و روز"></button></div></header>
 <main id="main"><noscript>برای کار با این برنامه جاوااسکریپت باید فعال باشد.</noscript></main>
 <div id="dock"><div id="tb"></div><nav id="nav" aria-label="بخش‌ها"></nav></div>
-<div id="qrscan" hidden style="position:fixed;inset:0;z-index:9998;background:var(--bg);padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));overflow:auto">
-  <div style="max-width:560px;margin:0 auto"><div class="card-h"><h2 style="margin:0">اسکن QR قیمت‌ها</h2><button id="qrx" type="button">بستن</button></div><p class="muted" style="font-size:.88em">کد QR نمایش‌داده‌شده در برنامه‌ی اصلی را مقابل دوربین قرار دهید. فقط QR امضاشده‌ی برنامه‌ی اصلی پذیرفته می‌شود.</p><video id="qrv" playsinline muted style="display:block;width:100%;max-height:62vh;object-fit:contain;background:#111;border-radius:12px"></video><p id="qrm" class="hint" role="status">در حال آماده‌سازی دوربین…</p></div>
-</div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
 (() => {
 'use strict';
-const APP_VER = '1.3.6';
+const APP_VER = '1.5.0';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const mem = {};
@@ -170,7 +198,7 @@ const main = $('#main');
 /* ============================ device-bound activation ============================
    The workshop program signs a code for one device id (ECDSA P-256); the phone checks the signature offline with the public key
    that the program injected into this file when it built the locked package.  Without a key (raw template) the app runs unlocked. */
-const LIC_PUB = '04c7183b68c92df7e42c3c3d060ff83ebf3abf3c911710fda14f64d8945cda3dbbcdd0d886717c108020635e107b7fb60722fea8db4868d19327f89b440b2f8fab';
+const LIC_PUB = '044b839a0651d3cd023a79b7fdf301432bd0848f588ebfea6d887c3f2691c6d635f381d1ca5f056c16abd0e9f2c7c510dc7afa8a1f6e3bbb7c3ce35e0434bcee3f';
 const LIC_ON = LIC_PUB.slice(0, 2) !== '__';
 const B32 = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 let licOK = !LIC_ON, licInfo = {mode: LIC_ON ? 'locked' : 'dev'};
@@ -311,7 +339,7 @@ function sanitizeData(o, base) {
     qty_tiers: /^[\d\s:.,٫٬۰-۹]*$/.test(tiers) ? tiers : b.qty_tiers}};
 }
 const sanitizePrefs = o => ({mode: ['auto', 'light', 'dark'].includes(o?.mode) ? o.mode : 'auto', accent: /^#[0-9a-f]{6}$/i.test(o?.accent || '') ? o.accent.toLowerCase() : '#0f766e',
-  size: ['s', 'm', 'l'].includes(o?.size) ? o.size : 'm', digits: o?.digits === 'en' ? 'en' : 'fa', unit: o?.unit === 'toman' ? 'toman' : 'rial', haptic: o?.haptic !== false, shop: str(o?.shop, 40)});
+  size: ['s', 'm', 'l'].includes(o?.size) ? o.size : 'm', digits: o?.digits === 'en' ? 'en' : 'fa', unit: o?.unit === 'toman' ? 'toman' : 'rial', haptic: o?.haptic !== false, guard: o?.guard !== false, shop: str(o?.shop, 40)});
 let uid = 0;
 const newRow = () => ({u: ++uid, mid: null, price: '', l: '', w: '', qty: '1', svcs: {}, labor: '', open: true});
 const blankCalc = () => ({rows: [newRow()], disc: '', rush: false, min: false, tax: false, box: {l: '', w: '', p: ''}, neon: {m: '', p: ''}});
@@ -431,14 +459,14 @@ function rowHTML(it, i) {
 function viewCalc() {
   const seen = store.get('lc.seen');
   main.innerHTML = `${seen ? '' : '<div class="info" id="intro"><span>قیمت‌ها را از بخش «قیمت‌ها» و رنگ/حالت شب را از «تنظیمات» عوض کنید. همه‌چیز روی همین گوشی ذخیره می‌شود و بدون اینترنت هم کار می‌کند.</span><button data-a="seen" aria-label="بستن">✕</button></div>'}
-  <div id="rows">${C.rows.map(rowHTML).join('')}</div>
-  <div class="btns"><button class="pri" data-a="radd">+ ردیف جدید</button><button data-a="rclr">پاک کردن همه</button></div>
-  <section class="card"><h2>تخفیف و هزینه‌های اضافی</h2>
+  <div class="cols"><div class="c1"><div id="rows">${C.rows.map(rowHTML).join('')}</div>
+  <div class="btns"><button class="pri" data-a="radd">+ ردیف جدید</button><button data-a="rclr">پاک کردن همه</button></div></div>
+  <div class="c2"><section class="card"><h2>تخفیف و هزینه‌های اضافی</h2>
     <label style="margin-top:0">تخفیف کل (٪)${numIn('id="disc"', C.disc)}</label>
     <div style="margin-top:6px"><label class="sw">سفارش فوری (${fmt(num(D.st.rush_pct), 2)}٪)<input type="checkbox" data-c="rush" ${C.rush ? 'checked' : ''}></label>
     <label class="sw">اعمال حداقل سفارش (${money(+D.st.min_order || 0)} ${uname()})<input type="checkbox" data-c="min" ${C.min ? 'checked' : ''}></label>
     <label class="sw">مالیات (${fmt(num(D.st.tax_percent), 2)}٪)<input type="checkbox" data-c="tax" ${C.tax ? 'checked' : ''}></label></div></section>
-  <section class="card sum" id="sumc"></section>`;
+  <section class="card sum" id="sumc"></section></div></div>`;
   updCalc();
 }
 function updCalc() {
@@ -477,12 +505,12 @@ function summary() {
 
 /* ============================ box / neon tab ============================ */
 function viewBox() {
-  main.innerHTML = `<section class="card"><h2>هزینه‌ی باکس چنلیوم</h2><p class="muted" style="margin:0">فرمول: (طول × عرض) × مبلغ هر متر مربع</p>
+  main.innerHTML = `<div class="pair"><section class="card"><h2>هزینه‌ی باکس چنلیوم</h2><p class="muted" style="margin:0">فرمول: (طول × عرض) × مبلغ هر متر مربع</p>
     <div class="g2"><label>طول (سانت)${numIn('data-b="l"', C.box.l)}</label><label>عرض (سانت)${numIn('data-b="w"', C.box.w)}</label></div>
     <label>مبلغ هر متر مربع (${uname()})${moneyIn('data-b="p"', priceDisp(C.box.p))}<span class="hint acc" id="bp-t"></span></label><div id="b-res"></div></section>
-  <section class="card"><h2>هزینه نئون پلکسی و حروف چنلیوم</h2><p class="muted" style="margin:0">فرمول: متراژ × مبلغ هر متر</p>
+  <section class="card"><h2>هزینه‌ی نئون‌پلکسی و حروف چنلیوم</h2><p class="muted" style="margin:0">فرمول: متراژ × مبلغ هر متر</p>
     <label>متراژ (متر)${numIn('data-n="m"', C.neon.m)}</label>
-    <label>مبلغ هر متر (${uname()})${moneyIn('data-n="p"', priceDisp(C.neon.p))}<span class="hint acc" id="np-t"></span></label><div id="n-res"></div></section>`;
+    <label>مبلغ هر متر (${uname()})${moneyIn('data-n="p"', priceDisp(C.neon.p))}<span class="hint acc" id="np-t"></span></label><div id="n-res"></div></section></div>`;
   updSide();
 }
 function updSide() {
@@ -490,7 +518,7 @@ function updSide() {
   $('#bp-t').textContent = bp > 0 ? `${money2(bp)} ${uother()}` : '';
   $('#b-res').innerHTML = `<div class="hint" style="margin-top:6px">مساحت: ${fmt(+b.area.toFixed(4), 4)} متر مربع</div>` + res(b.cost, 'هزینه‌ی باکس');
   $('#np-t').textContent = np > 0 ? `${money2(np)} ${uother()}` : '';
-  $('#n-res').innerHTML = res(n, 'هزینه نئون پلکسی و حروف چنلیوم');
+  $('#n-res').innerHTML = res(n, 'هزینه‌ی نئون‌پلکسی و حروف چنلیوم');
 }
 
 /* ============================ prices tab ============================ */
@@ -535,13 +563,15 @@ const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.
 const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 function viewSettings() {
   const st = D.st, rialF = (k, l) => `<label>${l} (${uname()})${moneyIn(`data-st="${k}"`, +st[k] ? grp3(String(R2U(+st[k]))) : '')}</label>`;
-  main.innerHTML = `<section class="card"><h2>ظاهر برنامه</h2>
+  main.innerHTML = `<div class="mas"><section class="card"><h2>ظاهر برنامه</h2>
     <div class="row-l" style="margin-top:0">حالت نمایش</div>${seg('mode', [['auto', 'خودکار'], ['light', '☀ روز'], ['dark', '🌙 شب']])}
     <div class="row-l">رنگ تم</div><div class="swatches">${ACCENTS.map(c => `<button data-a="accent" data-v="${c}" style="background:${c}" aria-label="${c}" aria-pressed="${P.accent === c}"></button>`).join('')}<label style="margin:0;display:flex;gap:6px;align-items:center;font-size:.85em">دلخواه<input type="color" id="accc" value="${P.accent}"></label></div>
     <div class="row-l">اندازه‌ی نوشته‌ها</div>${seg('size', [['s', 'کوچک'], ['m', 'متوسط'], ['l', 'بزرگ']])}
     <div class="row-l">نوع ارقام</div>${seg('digits', [['fa', '۱۲۳ فارسی'], ['en', '123 انگلیسی']])}
     <div class="row-l">واحد پول (نمایش و ورود قیمت)</div>${seg('unit', [['rial', 'ریال'], ['toman', 'تومان']])}
     <label class="sw" style="margin-top:12px">لرزش کوتاه هنگام کپی (اندروید)<input type="checkbox" data-c="haptic" ${P.haptic ? 'checked' : ''}></label>
+    <label class="sw">تأیید دوباره‌ی «برگشت» قبل از خروج از برنامه<input type="checkbox" data-c="guard" ${P.guard !== false ? 'checked' : ''}></label>
+    <span class="hint">خاموش: با یک بار «برگشت» از برنامه خارج می‌شوید. بعد از تغییر، برنامه را یک بار ببندید و دوباره باز کنید.</span>
     <label>نام کارگاه (بالای برنامه و متن ارسالی)<input type="text" id="shop" value="${esc(P.shop)}" maxlength="40" autocomplete="off" placeholder="مثلاً: نور لیزر"></label></section>
   <section class="card"><h2>تنظیمات محاسبه</h2>
     <div class="g2"><label>درصد سفارش فوری${numIn('data-st="rush_pct"', st.rush_pct)}</label><label>درصد مالیات${numIn('data-st="tax_percent"', st.tax_percent)}</label></div>
@@ -550,12 +580,14 @@ function viewSettings() {
     <span class="hint">مثال: «5:5, 10:10» یعنی از ۵ عدد ۵٪ و از ۱۰ عدد ۱۰٪ تخفیف.</span></section>
   <section class="card"><h2>داده‌ها و پشتیبان</h2>
     <p class="muted" style="margin:0 0 8px;font-size:.85em">برای انتقال قیمت‌ها از برنامه‌ی اصلی کارگاه: در صفحه‌ی «ماشین حساب» آن برنامه دکمه‌ی «خروجی قیمت‌ها برای موبایل» را بزنید و فایل را اینجا وارد کنید.</p>
+    <div class="btns" style="margin:0 0 8px"><button class="pri" data-a="qrscan" style="flex:1 1 100%">▦ اسکن QR قیمت‌ها از کامپیوتر</button></div>
+    <span class="hint" style="display:block;margin-bottom:10px">در برنامه‌ی کامپیوتر، صفحه‌ی «ماشین حساب» ← «همگام‌سازی با QR» را بزنید و دوربین را روبه‌روی کد نگه دارید.</span>
     <div class="btns" style="margin:0"><button data-a="export">ذخیره‌ی پشتیبان</button><button data-a="import">وارد کردن از فایل</button></div>
     <input type="file" id="ifile" accept=".json,application/json,text/plain" hidden>
     <details style="margin-top:10px"><summary style="cursor:pointer;color:var(--acc-d);font-size:.9em">وارد کردن با چسباندن متن</summary><textarea id="itext" rows="4" class="ltr" dir="ltr" placeholder='{"materials": [...]}' style="margin-top:6px"></textarea><button data-a="itext" style="margin-top:6px;width:100%">وارد کردن</button></details>
     <button class="dng" data-a="reset" style="width:100%;margin-top:10px">بازگشت به قیمت‌های پیش‌فرض</button></section>
   ${licStatus()}
-  <section class="card"><h2>نصب روی گوشی</h2>${installHTML()}</section>
+  <section class="card"><h2>نصب روی گوشی</h2>${installHTML()}</section></div>
   <p class="muted" style="text-align:center;font-size:.8em">ماشین‌حساب لیزر — نسخه‌ی ${P.digits === 'en' ? APP_VER : APP_VER.replace(/\d/g, d => FA[d])}</p>`;
 }
 function installHTML() {
@@ -574,126 +606,13 @@ async function exportBackup() {
   const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   toast('فایل پشتیبان ذخیره شد');
 }
-function importText(text) {
+function importText(text, note) {
   let o; try { o = JSON.parse(text); } catch (e) { return toast('فایل یا متن معتبر نیست'); }
   const d = sanitizeData(o, D); if (!d) return toast('این فایل، قیمت‌های ماشین‌حساب نیست');
-  if (!confirm(`${fmt(d.materials.length)} متریال و ${fmt(d.services.length)} خدمت جایگزین قیمت‌های فعلی می‌شود. ادامه می‌دهید؟`)) return;
+  if (!confirm(`${fmt(d.materials.length)} متریال و ${fmt(d.services.length)} خدمت جایگزین قیمت‌های فعلی می‌شود. ادامه می‌دهید؟${note || ''}`)) return;
   D = d; if (o.app === 'laser-calc' && o.prefs) P = sanitizePrefs({...P, ...o.prefs});
   fixRefs(); flush(); applyTheme(); render(); toast('قیمت‌ها وارد شد');
 }
-
-/* ============================ signed price QR transfer ============================ */
-let qrStream = null, qrFrame = 0, qrBusy = false, qrJsPromise = null, qrAssembly = null;
-function loadQRDecoder() {
-  if (window.jsQR) return Promise.resolve(window.jsQR);
-  if (qrJsPromise) return qrJsPromise;
-  qrJsPromise = new Promise((resolve, reject) => {
-    const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js'; sc.async = true;
-    sc.onload = () => window.jsQR ? resolve(window.jsQR) : reject(new Error('کتابخانه‌ی اسکن QR بارگذاری نشد'));
-    sc.onerror = () => reject(new Error('برای بارگذاری اسکنر QR به اینترنت نیاز است. اتصال اینترنت را بررسی کنید.'));
-    document.head.appendChild(sc);
-  }).catch(err => { qrJsPromise = null; throw err; });
-  return qrJsPromise;
-}
-const B45 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
-function receiveQRPart(value) {
-  const m = /^LCP2([0-9A-F]{8})(\d{3})(\d{3})([0-9A-Z $%*+\- .\/:]+)$/.exec(String(value || ''));
-  if (!m) return null;
-  const id = m[1], index = Number(m[2]), total = Number(m[3]), chunk = m[4];
-  if (!total || total > 999 || !index || index > total || !chunk) return null;
-  if (!qrAssembly || qrAssembly.id !== id || qrAssembly.total !== total) qrAssembly = {id, total, parts: new Array(total), count: 0};
-  if (qrAssembly.parts[index - 1] === undefined) {
-    qrAssembly.parts[index - 1] = chunk; qrAssembly.count++;
-  }
-  const msg = $('#qrm');
-  if (msg) msg.textContent = `دریافت بخش ${qrAssembly.count} از ${total}؛ دوربین را مقابل کدهای در حال تغییر نگه دارید…`;
-  if (qrAssembly.count !== total) return null;
-  const payload = qrAssembly.parts.join(''); qrAssembly = null;
-  return 'LCPR1' + payload;
-}
-function b45decode(s) {
-  if (!s || s.length % 3 === 1) throw new Error('ساختار QR معتبر نیست');
-  const out = []; let i = 0;
-  for (; i + 2 < s.length; i += 3) {
-    const a = B45.indexOf(s[i]), b = B45.indexOf(s[i+1]), c = B45.indexOf(s[i+2]);
-    if (a < 0 || b < 0 || c < 0) throw new Error('ساختار QR معتبر نیست');
-    const n = a + b * 45 + c * 2025; if (n > 65535) throw new Error('داده‌ی QR خراب است');
-    out.push(n >> 8, n & 255);
-  }
-  if (i < s.length) {
-    const a = B45.indexOf(s[i]), b = B45.indexOf(s[i+1]);
-    if (a < 0 || b < 0) throw new Error('ساختار QR معتبر نیست');
-    const n = a + b * 45; if (n > 255) throw new Error('داده‌ی QR خراب است'); out.push(n);
-  }
-  return new Uint8Array(out);
-}
-async function inflatePricePayload(bytes) {
-  if (!('DecompressionStream' in window)) throw new Error('مرورگر این دستگاه فشرده‌گشایی امن را پشتیبانی نمی‌کند؛ مرورگر را به‌روز کنید.');
-  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate'));
-  return new Response(stream).text();
-}
-async function acceptSignedPriceQR(token) {
-  if (!LIC_ON || !/^[0-9a-f]{130}$/i.test(LIC_PUB)) throw new Error('نسخه‌ی قفل‌دار معتبر برای بررسی امضای QR نصب نشده است.');
-  const code = String(token || '');
-  if (!code.startsWith('LCPR1') || code.length <= 101) throw new Error('این QR متعلق به برنامه‌ی اصلی لیزر نیست.');
-  const body = code.slice(5), packed = b45decode(body.slice(0, -96)), sig = b45decode(body.slice(-96));
-  if (sig.length !== 64 || packed.length < 8 || packed.length > 200000) throw new Error('اطلاعات QR ناقص یا نامعتبر است.');
-  const key = await crypto.subtle.importKey('raw', hex2b(LIC_PUB), {name:'ECDSA',namedCurve:'P-256'}, false, ['verify']);
-  const msg = new Uint8Array([...new TextEncoder().encode('LCPR1'), ...packed]);
-  const valid = await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'}, key, sig, msg);
-  if (!valid) throw new Error('امضای QR معتبر نیست؛ قیمت‌ها تغییر نکردند.');
-  const json = await inflatePricePayload(packed);
-  let o; try { o = JSON.parse(json); } catch (e) { throw new Error('محتوای QR قابل خواندن نیست.'); }
-  if (!o || o.app !== 'laser-calc' || o.v !== 1 || o.source !== 'laser-invoice') throw new Error('این QR بسته‌ی قیمت معتبر برنامه‌ی اصلی نیست.');
-  const d = sanitizeData(o, D); if (!d) throw new Error('ساختار فهرست قیمت‌ها معتبر نیست.');
-  // Commit only after signature, decompression, JSON and schema validation have all succeeded.
-  D = d; fixRefs(); flush(); render();
-  toast(`${fmt(d.materials.length)} متریال و ${fmt(d.services.length)} خدمت با موفقیت به‌روز شد`);
-}
-function stopQRScan() {
-  cancelAnimationFrame(qrFrame); qrFrame = 0;
-  if (qrStream) { qrStream.getTracks().forEach(t => t.stop()); qrStream = null; }
-  const v = $('#qrv'); if (v) v.srcObject = null;
-  $('#qrscan').hidden = true; qrBusy = false; qrAssembly = null;
-}
-async function startQRScan() {
-  if (qrBusy) return; qrBusy = true;
-  const panel = $('#qrscan'), video = $('#qrv'), msg = $('#qrm'); panel.hidden = false; msg.textContent = 'در حال آماده‌سازی اسکنر…';
-  try {
-    if (!navigator.mediaDevices?.getUserMedia) throw new Error('دسترسی دوربین در این مرورگر فراهم نیست. برنامه را با HTTPS و مرورگر به‌روز باز کنید.');
-    // Request the camera immediately in the click gesture (important for iOS Safari).
-    const cameraPromise = navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
-    const decoderPromise = loadQRDecoder();
-    qrStream = await cameraPromise;
-    const decode = await decoderPromise;
-    video.srcObject = qrStream; await video.play(); msg.textContent = 'دوربین را روبه‌روی QR برنامه‌ی اصلی نگه دارید…';
-    const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d',{willReadFrequently:true});
-    const tick = async () => {
-      if (!qrStream || panel.hidden) return;
-      if (video.readyState >= 2 && video.videoWidth) {
-        const scale = Math.min(1, 900 / video.videoWidth); canvas.width = Math.round(video.videoWidth * scale); canvas.height = Math.round(video.videoHeight * scale);
-        ctx.drawImage(video,0,0,canvas.width,canvas.height);
-        const im = ctx.getImageData(0,0,canvas.width,canvas.height), found = decode(im.data,im.width,im.height,{inversionAttempts:'attemptBoth'});
-        if (found?.data) {
-          // Backward-compatible with old single-frame LCPR1 codes; new LCP2 frames
-          // are collected (duplicates ignored) until the complete signed payload arrives.
-          const complete = found.data.startsWith('LCPR1') ? found.data : receiveQRPart(found.data);
-          if (complete) {
-            stopQRScan();
-            msg.textContent = 'همه‌ی بخش‌ها دریافت شد؛ امضای قیمت‌ها بررسی می‌شود…';
-            try { await acceptSignedPriceQR(complete); } catch (err) { toast(err.message || 'QR نامعتبر است'); }
-            return;
-          }
-        }
-      }
-      qrFrame = requestAnimationFrame(tick);
-    };
-    qrFrame = requestAnimationFrame(tick);
-  } catch (err) { stopQRScan(); toast(err.message || 'باز کردن دوربین ناموفق بود'); }
-}
-$('#qrs').addEventListener('click', startQRScan);
-$('#qrx').addEventListener('click', stopQRScan);
-window.addEventListener('pagehide', stopQRScan);
 
 /* ============================ routing & events ============================ */
 function render() {
@@ -707,35 +626,15 @@ function render() {
 function route() { const h = location.hash.slice(1); tab = TABS.some(t => t[0] === h) ? h : 'calc'; render(); window.scrollTo(0, 0); }
 
 /* ============================ back button / exit ============================
-   Tab changes replace the current entry, so Back never walks through visited tabs.
-   The first Back returns to the base entry and shows a hint; a second real Back can leave the app.
-   The Exit button now performs those two history-back steps itself, in sequence. Browsers may still
-   block scripted window closing when there is no previous history entry; in that case we explain the platform limit.
-   Nothing is reset: local data and activation stay on the device. */
+   Switching tabs only rewrites the current history entry (no new entries), so the phone's Back key no longer walks through every tab you visited.
+   The page keeps exactly two entries [base, app]: the first Back lands on "base" and shows a hint, the second Back leaves the app.
+   The extra entry is created from a real tap (browsers skip entries a page adds without user interaction). Nothing is reset: data and activation stay. */
 function backArm() {
+  if (P && P.guard === false) return;                            // guard off: no extra history entry, so Back leaves at once
   try { const st = history.state; if (!st || st.lc !== 'app') { history.replaceState({lc: 'base'}, ''); history.pushState({lc: 'app'}, ''); } } catch (e) {}
 }
-let exitInProgress = false, exitBackCount = 0, exitFallbackTimer = 0;
 ['pointerup', 'click', 'keydown'].forEach(ev => addEventListener(ev, backArm, true));
-addEventListener('popstate', () => {
-  if (exitInProgress) {
-    if (exitBackCount === 1) {
-      exitBackCount = 2;
-      // Wait for the first Back navigation to finish, then perform the second one.
-      setTimeout(() => { if (exitInProgress && exitBackCount === 2) { try { history.back(); } catch (e) {} } }, 100);
-      return;
-    }
-    exitInProgress = false;
-    if (exitFallbackTimer) clearTimeout(exitFallbackTimer);
-    return;
-  }
-  const st = history.state;
-  if (st && st.lc === 'base') toast('برای خروج، یک بار دیگر «برگشت» را بزنید');
-});
-addEventListener('pagehide', () => {
-  exitInProgress = false;
-  if (exitFallbackTimer) clearTimeout(exitFallbackTimer);
-});
+addEventListener('popstate', () => { const st = history.state; if (st && st.lc === 'base') toast('برای خروج، یک بار دیگر «برگشت» را بزنید'); });
 document.addEventListener('click', e => {
   const a = e.target.closest && e.target.closest('#nav a'); if (!a) return;
   const k = (a.getAttribute('href') || '').slice(1); if (!TABS.some(t => t[0] === k)) return;
@@ -743,23 +642,6 @@ document.addEventListener('click', e => {
   try { history.replaceState(history.state, '', '#' + k); } catch (x) {}
   route();
 });
-function exitApp() {
-  if (exitInProgress) return;
-  flush();                                                       // persist current values before leaving
-  exitInProgress = true;
-  exitBackCount = 1;
-  if (!history.state || history.state.lc !== 'app') backArm();   // ensure the first Back has the app's base entry
-  try { window.close(); } catch (e) {}                           // works in some installed-app contexts
-  try { history.back(); } catch (e) {                             // first Back step
-    exitInProgress = false;
-    return toast('مرورگر اجازه‌ی خروج خودکار نمی‌دهد؛ از دکمه‌ی خانه یا فهرست برنامه‌های گوشی استفاده کنید');
-  }
-  exitFallbackTimer = setTimeout(() => {
-    if (!exitInProgress || document.hidden) return;
-    exitInProgress = false;
-    toast('مرورگر اجازه‌ی بستن خودکار را نمی‌دهد؛ از دکمه‌ی خانه یا فهرست برنامه‌های گوشی خارج شوید');
-  }, 1600);
-}
 function sizeDock() { const h = Math.ceil($('#dock').getBoundingClientRect().height); document.documentElement.style.setProperty('--dock-h', h + 'px'); }
 try { new ResizeObserver(sizeDock).observe($('#dock')); } catch (e) {}
 
@@ -795,6 +677,7 @@ main.addEventListener('change', e => {
   if (d.f === 'mat') { const it = rowOf(el), m = mat(+el.value); Object.assign(it, {mid: m ? m.id : null, price: '', svcs: {}}); viewCalc(); sizeDock(); save(); return; }
   if (d.c && ['rush', 'min', 'tax'].includes(d.c)) { C[d.c] = el.checked; updCalc(); save(); return; }
   if (d.c === 'haptic') { P.haptic = el.checked; save(); buzz(30); return; }
+  if (d.c === 'guard') { P.guard = el.checked; save(); toast(el.checked ? 'خروج با دو بار «برگشت» (بعد از باز کردن دوباره‌ی برنامه)' : 'خروج با یک بار «برگشت» (بعد از باز کردن دوباره‌ی برنامه)'); return; }
   if (d.m === 'kind' || d.m === 'active' || d.s === 'active') {
     const card = el.closest('[data-id]'), o = (d.m ? D.materials : D.services).find(x => x.id === +card.dataset.id); if (!o) return;
     if (d.m === 'kind') o.kind = el.value === 'roll' ? 'roll' : 'sheet'; else o.active = el.checked ? 1 : 0;
@@ -824,6 +707,8 @@ document.addEventListener('click', e => {
     case 'accent': P.accent = d.v; applyTheme(); save(); viewSettings(); break;
     case 'export': exportBackup(); break;
     case 'import': $('#ifile').click(); break;
+    case 'qrscan': scanOpen(); break;
+    case 'scx': scanClose(); break;
     case 'itext': { const t = $('#itext').value.trim(); if (t) importText(t); else toast('متن را بچسبانید'); } break;
     case 'reset': if (confirm('همه‌ی متریال‌ها، خدمات و تنظیمات محاسبه به مقدار پیش‌فرض برمی‌گردد. ادامه می‌دهید؟')) { D = defaults(); fixRefs(); flush(); render(); toast('قیمت‌های پیش‌فرض برگشت'); } break;
     case 'copyid': copy(devId()); break;
@@ -854,6 +739,271 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 window.__lc = {totals, D: () => D, C: () => C, P: () => P, sanitizeData, defaults};
+/* ============================ QR price sync (scan the animated QR shown by the desktop program) ============================
+   Frames look like  LCP2.<crc32 of payload>.<i>.<n>.<chk>.<chunk>  ; payload = zlib(JSON) + 64-byte ECDSA signature, as base64url.
+   Decoding: the phone's BarcodeDetector when it exists, otherwise the small decoder below (byte mode, level M, versions 1-9 - exactly what the desktop makes). */
+const crc32 = (u8) => { let c, crc = -1; for (let i = 0; i < u8.length; i++) { c = (crc ^ u8[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; };
+const b64u = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+function inflateZ(src) {                      // zlib stream -> Uint8Array (RFC 1950/1951)
+  let p = 2, bb = 0, bc = 0; const out = [];
+  const bits = n => { while (bc < n) { if (p >= src.length) throw new Error('eof'); bb |= src[p++] << bc; bc += 8; } const v = bb & ((1 << n) - 1); bb >>>= n; bc -= n; return v; };
+  const build = lens => { const cnt = new Array(16).fill(0), offs = new Array(16).fill(0), sym = []; lens.forEach(l => cnt[l]++); cnt[0] = 0; for (let i = 1; i < 16; i++) offs[i] = offs[i - 1] + cnt[i - 1]; lens.forEach((l, s) => { if (l) sym[offs[l]++] = s; }); return {cnt, sym}; };
+  const dec = t => { let code = 0, first = 0, idx = 0; for (let l = 1; l < 16; l++) { code |= bits(1); const c = t.cnt[l]; if (code - c < first) return t.sym[idx + (code - first)]; idx += c; first += c; first <<= 1; code <<= 1; } throw new Error('code'); };
+  const LB = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258], LE = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
+  const DB = [1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577], DE = [0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13];
+  let fixedL, fixedD;
+  for (let last = 0; !last;) {
+    last = bits(1); const type = bits(2);
+    if (type === 0) { bb = 0; bc = 0; const len = src[p] | (src[p + 1] << 8); p += 4; for (let i = 0; i < len; i++) out.push(src[p++]); continue; }
+    let lt, dt;
+    if (type === 1) {
+      if (!fixedL) { const l = []; for (let i = 0; i < 288; i++) l.push(i < 144 ? 8 : i < 256 ? 9 : i < 280 ? 7 : 8); fixedL = build(l); fixedD = build(new Array(30).fill(5)); }
+      lt = fixedL; dt = fixedD;
+    } else if (type === 2) {
+      const nl = bits(5) + 257, nd = bits(5) + 1, nc = bits(4) + 4, ord = [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15], cl = new Array(19).fill(0);
+      for (let i = 0; i < nc; i++) cl[ord[i]] = bits(3);
+      const ct = build(cl), lens = [];
+      while (lens.length < nl + nd) {
+        const s = dec(ct);
+        if (s < 16) lens.push(s);
+        else { let rep, v = 0; if (s === 16) { if (!lens.length) throw new Error('rep'); v = lens[lens.length - 1]; rep = 3 + bits(2); } else if (s === 17) rep = 3 + bits(3); else rep = 11 + bits(7); while (rep--) lens.push(v); }
+      }
+      lt = build(lens.slice(0, nl)); dt = build(lens.slice(nl, nl + nd));
+    } else throw new Error('type');
+    for (;;) {
+      const s = dec(lt);
+      if (s < 256) out.push(s); else if (s === 256) break;
+      else { const i = s - 257, len = LB[i] + bits(LE[i]), j = dec(dt), dist = DB[j] + bits(DE[j]); if (dist > out.length) throw new Error('dist'); for (let k = 0; k < len; k++) out.push(out[out.length - dist]); if (out.length > 4e6) throw new Error('big'); }
+    }
+  }
+  return new Uint8Array(out);
+}
+
+/* ---- QR decoder ---- */
+const QR_EC = {1: [10, [[1, 16]]], 2: [16, [[1, 28]]], 3: [26, [[1, 44]]], 4: [18, [[2, 32]]], 5: [24, [[2, 43]]], 6: [16, [[4, 27]]], 7: [18, [[4, 31]]], 8: [22, [[2, 38], [2, 39]]], 9: [22, [[3, 36], [2, 37]]]};
+const QR_AL = {1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30], 6: [6, 34], 7: [6, 22, 38], 8: [6, 24, 42], 9: [6, 26, 46]};
+const QR_FMT = (() => { const t = []; for (let d = 0; d < 32; d++) { let r = d << 10; for (let i = 14; i >= 10; i--) if ((r >> i) & 1) r ^= 0x537 << (i - 10); t.push(((d << 10) | r) ^ 0x5412); } return t; })();
+const pop = x => { let n = 0; while (x) { n += x & 1; x >>>= 1; } return n; };
+function qrBinarize(w, h, rgba) {              // adaptive threshold (mean of a window) -> Uint8Array, 1 = dark
+  const g = new Uint8Array(w * h); for (let i = 0, j = 0; i < g.length; i++, j += 4) g[i] = (rgba[j] * 77 + rgba[j + 1] * 151 + rgba[j + 2] * 28) >> 8;
+  const W = w + 1, I = new Float64Array(W * (h + 1));
+  for (let y = 0; y < h; y++) { let s = 0; for (let x = 0; x < w; x++) { s += g[y * w + x]; I[(y + 1) * W + x + 1] = I[y * W + x + 1] + s; } }
+  const r = Math.max(8, Math.round(Math.min(w, h) / 10)), b = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) { const y0 = Math.max(0, y - r), y1 = Math.min(h, y + r + 1);
+    for (let x = 0; x < w; x++) { const x0 = Math.max(0, x - r), x1 = Math.min(w, x + r + 1), n = (x1 - x0) * (y1 - y0), m = (I[y1 * W + x1] - I[y0 * W + x1] - I[y1 * W + x0] + I[y0 * W + x0]) / n; b[y * w + x] = g[y * w + x] < m * 0.9 - 3 ? 1 : 0; } }
+  return b;
+}
+function qrFinders(w, h, b) {
+  const found = [];
+  const ok = (r, tot) => { const m = tot / 7; return m >= 1 && Math.abs(r[0] - m) < m * .75 && Math.abs(r[1] - m) < m * .75 && Math.abs(r[2] - 3 * m) < m * 1.1 && Math.abs(r[3] - m) < m * .75 && Math.abs(r[4] - m) < m * .75; };
+  const line = (get, n) => { // returns list of [centerPos, moduleSize] for each 1:1:3:1:1 in a line
+    const res = [], all = []; let cur = get(0), len = 1;
+    for (let i = 1; i <= n; i++) { if (i === n || get(i) !== cur) { all.push([cur, len, i - len]); if (i < n) { cur = get(i); len = 1; } } else len++; }
+    for (let i = 0; i + 4 < all.length; i++) {
+      if (all[i][0] !== 1) continue; const r = all.slice(i, i + 5).map(x => x[1]), tot = r[0] + r[1] + r[2] + r[3] + r[4];
+      if (ok(r, tot)) res.push([all[i][2] + tot / 2, tot / 7]);
+    }
+    return res;
+  };
+  for (let y = 0; y < h; y += 1) {
+    for (const [cx, m] of line(i => b[y * w + i], w)) {
+      const xi = Math.round(cx), v = line(i => b[i * w + xi], h).filter(c => Math.abs(c[0] - y) < m * 3 && Math.abs(c[1] - m) < m * .5);
+      if (!v.length) continue; const cy = v[0][0];
+      const hh = line(i => b[Math.round(cy) * w + i], w).filter(c => Math.abs(c[0] - cx) < m * 3);
+      const fx = hh.length ? hh[0][0] : cx;
+      const near = found.find(f => Math.hypot(f.x - fx, f.y - cy) < m * 2 && Math.abs(f.m - m) < m * .6);
+      if (near) { near.x = (near.x * near.n + fx) / (near.n + 1); near.y = (near.y * near.n + cy) / (near.n + 1); near.m = (near.m * near.n + m) / (near.n + 1); near.n++; } else found.push({x: fx, y: cy, m, n: 1});
+    }
+  }
+  return found.filter(f => f.n >= 2).sort((a, c) => c.n - a.n).slice(0, 9);
+}
+function qrHomography(src, dst) {                // 4 points (u,v)->(x,y); returns function
+  const A = [], B = [];
+  for (let i = 0; i < 4; i++) { const [u, v] = src[i], [x, y] = dst[i]; A.push([u, v, 1, 0, 0, 0, -u * x, -v * x]); B.push(x); A.push([0, 0, 0, u, v, 1, -u * y, -v * y]); B.push(y); }
+  for (let c = 0; c < 8; c++) {
+    let p = c; for (let r = c + 1; r < 8; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+    [A[c], A[p]] = [A[p], A[c]]; [B[c], B[p]] = [B[p], B[c]]; if (Math.abs(A[c][c]) < 1e-12) return null;
+    for (let r = 0; r < 8; r++) if (r !== c) { const f = A[r][c] / A[c][c]; for (let k = c; k < 8; k++) A[r][k] -= f * A[c][k]; B[r] -= f * B[c]; }
+  }
+  const h = B.map((v, i) => v / A[i][i]);
+  return (u, v) => { const d = h[6] * u + h[7] * v + 1; return [(h[0] * u + h[1] * v + h[2]) / d, (h[3] * u + h[4] * v + h[5]) / d]; };
+}
+function qrFuncMap(ver) {
+  const N = 17 + 4 * ver, f = Array.from({length: N}, () => new Uint8Array(N));
+  const box = (r0, c0, r1, c1) => { for (let r = Math.max(0, r0); r <= Math.min(N - 1, r1); r++) for (let c = Math.max(0, c0); c <= Math.min(N - 1, c1); c++) f[r][c] = 1; };
+  box(0, 0, 8, 8); box(0, N - 8, 8, N - 1); box(N - 8, 0, N - 1, 8);
+  for (let i = 0; i < N; i++) { f[6][i] = 1; f[i][6] = 1; }
+  if (ver >= 7) { box(0, N - 11, 5, N - 9); box(N - 11, 0, N - 9, 5); }     // version information
+  const al = QR_AL[ver]; for (const r of al) for (const c of al) { if ((r === 6 && c === 6) || (r === 6 && c === al[al.length - 1]) || (c === 6 && r === al[al.length - 1])) continue; box(r - 2, c - 2, r + 2, c + 2); }
+  return f;
+}
+const GF_E = new Array(512), GF_L = new Array(256); { let x = 1; for (let i = 0; i < 255; i++) { GF_E[i] = x; GF_L[x] = i; x <<= 1; if (x & 256) x ^= 0x11D; } for (let i = 255; i < 512; i++) GF_E[i] = GF_E[i - 255]; }
+const gm = (a, b) => a && b ? GF_E[GF_L[a] + GF_L[b]] : 0, gd = (a, b) => a ? GF_E[(GF_L[a] + 255 - GF_L[b]) % 255] : 0;
+function rsFix(cw, ecn) {                      // Reed-Solomon error correction of one block (data + ec codewords); null when it cannot be repaired
+  const n = cw.length, syn = a => { const S = []; let any = 0; for (let i = 0; i < ecn; i++) { let v = 0; for (let j = 0; j < n; j++) v = gm(v, GF_E[i]) ^ a[j]; S.push(v); any |= v; } return [S, any]; };
+  const [S, any] = syn(cw); if (!any) return cw;
+  let C = [1], B = [1], L = 0, m = 1, b = 1;
+  for (let k = 0; k < ecn; k++) {
+    let d = S[k]; for (let i = 1; i <= L; i++) d ^= gm(C[i] || 0, S[k - i]);
+    if (!d) { m++; continue; }
+    const T = C.slice(), coef = gd(d, b), nc = C.slice(); while (nc.length < B.length + m) nc.push(0);
+    for (let i = 0; i < B.length; i++) nc[i + m] ^= gm(coef, B[i]);
+    if (2 * L <= k) { L = k + 1 - L; B = T; b = d; m = 1; } else m++;
+    C = nc;
+  }
+  if (L > ecn / 2) return null;
+  const pos = [];
+  for (let j = 0; j < n; j++) { const xi = GF_E[(255 - ((n - 1 - j) % 255)) % 255]; let v = 0, xp = 1; for (let i = 0; i <= L; i++) { v ^= gm(C[i] || 0, xp); xp = gm(xp, xi); } if (!v) pos.push(j); }
+  if (pos.length !== L) return null;
+  const om = new Array(ecn).fill(0); for (let i = 0; i < ecn; i++) for (let j = 0; j <= i && j <= L; j++) om[i] ^= gm(C[j] || 0, S[i - j]);
+  const out = cw.slice();
+  for (const j of pos) {
+    const e = (n - 1 - j) % 255, X = GF_E[e], xi = GF_E[(255 - e) % 255]; let num = 0, xp = 1;
+    for (let i = 0; i < ecn; i++) { num ^= gm(om[i], xp); xp = gm(xp, xi); }
+    let den = 0; for (let i = 1; i <= L; i += 2) den ^= gm(C[i] || 0, GF_E[(255 - e) * (i - 1) % 255]);
+    if (!den) return null; out[j] ^= gm(X, gd(num, den));
+  }
+  return syn(out)[1] ? null : out;
+}
+function qrRead(bin, ver, sample) {              // sample(c, r) -> 0/1 ; returns string or null
+  const N = 17 + 4 * ver, M = Array.from({length: N}, (_, r) => Array.from({length: N}, (_, c) => sample(c + .5, r + .5)));
+  const fb = (cells) => cells.reduce((a, [x, y], i) => a | (M[y][x] << i), 0);
+  const c1 = []; for (let i = 0; i < 6; i++) c1.push([8, i]); c1.push([8, 7], [8, 8], [7, 8]); for (let i = 9; i < 15; i++) c1.push([14 - i, 8]);
+  const c2 = []; for (let i = 0; i < 8; i++) c2.push([N - 1 - i, 8]); for (let i = 8; i < 15; i++) c2.push([8, N - 15 + i]);
+  let best = -1, bd = 99;
+  for (const cells of [c1, c2]) { const v = fb(cells); for (let d = 0; d < 32; d++) { const e = pop(v ^ QR_FMT[d]); if (e < bd) { bd = e; best = d; } } }
+  if (bd > 3 || (best >> 3) !== 0) return null;      // level M only
+  const mask = best & 7, f = qrFuncMap(ver), bits = [];
+  const mk = [(r, c) => (r + c) % 2 === 0, (r, c) => r % 2 === 0, (r, c) => c % 3 === 0, (r, c) => (r + c) % 3 === 0, (r, c) => (((r / 2) | 0) + ((c / 3) | 0)) % 2 === 0, (r, c) => (r * c) % 2 + (r * c) % 3 === 0, (r, c) => ((r * c) % 2 + (r * c) % 3) % 2 === 0, (r, c) => ((r + c) % 2 + (r * c) % 3) % 2 === 0][mask];
+  for (let right = N - 1, up = true; right >= 1; right -= 2) {
+    if (right === 6) right = 5;
+    for (let k = 0; k < N; k++) { const r = up ? N - 1 - k : k; for (let j = 0; j < 2; j++) { const c = right - j; if (!f[r][c]) bits.push(M[r][c] ^ (mk(r, c) ? 1 : 0)); } }
+    up = !up;
+  }
+  const cw = []; for (let i = 0; i + 8 <= bits.length; i += 8) { let v = 0; for (let k = 0; k < 8; k++) v = (v << 1) | bits[i + k]; cw.push(v); }
+  const [ecn, groups] = QR_EC[ver], blocks = []; for (const [n, d] of groups) for (let i = 0; i < n; i++) blocks.push(d);
+  const maxd = Math.max(...blocks), data = blocks.map(() => []), ec = blocks.map(() => []); let p = 0;
+  for (let i = 0; i < maxd; i++) blocks.forEach((d, bi) => { if (i < d) data[bi].push(cw[p++]); });
+  for (let i = 0; i < ecn; i++) blocks.forEach((d, bi) => { ec[bi].push(cw[p++]); });
+  for (let bi = 0; bi < blocks.length; bi++) { const fixed = rsFix(data[bi].concat(ec[bi]), ecn); if (!fixed) return null; data[bi] = fixed.slice(0, blocks[bi]); }
+  const all = [].concat(...data); let bp = 0;
+  const rb = n => { let v = 0; for (let i = 0; i < n; i++, bp++) { const byte = all[bp >> 3]; if (byte === undefined) return -1; v = (v << 1) | ((byte >> (7 - (bp & 7))) & 1); } return v; };
+  if (rb(4) !== 4) return null; const len = rb(8); if (len < 0 || len > all.length) return null;
+  let s = ''; for (let i = 0; i < len; i++) { const c = rb(8); if (c < 32 || c > 126) return null; s += String.fromCharCode(c); }
+  return s;
+}
+function qrDecode(w, h, rgba) {
+  const b = qrBinarize(w, h, rgba), F = qrFinders(w, h, b);
+  if (F.length < 3) return null;
+  const at = (x, y) => { x = Math.round(x); y = Math.round(y); return x < 0 || y < 0 || x >= w || y >= h ? 0 : b[y * w + x]; };
+  for (let i = 0; i < F.length; i++) for (let j = i + 1; j < F.length; j++) for (let k = j + 1; k < F.length; k++) {
+    const T = [F[i], F[j], F[k]], d = (a, c) => Math.hypot(a.x - c.x, a.y - c.y);
+    const ds = [d(T[1], T[2]), d(T[0], T[2]), d(T[0], T[1])], oi = ds.indexOf(Math.max(...ds)); // TL is opposite the longest side
+    const tl = T[oi], o = T.filter((_, n) => n !== oi); let tr = o[0], bl = o[1];
+    const cross = (tr.x - tl.x) * (bl.y - tl.y) - (tr.y - tl.y) * (bl.x - tl.x); if (cross < 0) [tr, bl] = [bl, tr];
+    const a = d(tl, tr), c = d(tl, bl); if (Math.abs(a - c) > Math.max(a, c) * .3) continue;
+    const m = (tl.m + tr.m + bl.m) / 3, est = (a + c) / 2 / m + 7;          // modules per side
+    for (let ver = 1; ver <= 9; ver++) {
+      const N = 17 + 4 * ver; if (Math.abs(N - est) > Math.max(4, est * .12)) continue;
+      const S = N - 7, ux = [(tr.x - tl.x) / S, (tr.y - tl.y) / S], uy = [(bl.x - tl.x) / S, (bl.y - tl.y) / S];
+      const pt = (u, v) => [tl.x + (u - 3.5) * ux[0] + (v - 3.5) * uy[0], tl.y + (u - 3.5) * ux[1] + (v - 3.5) * uy[1]];
+      const mm = (Math.hypot(...ux) + Math.hypot(...uy)) / 2;
+      const snap = (p0, half, dark, r, st) => {                       // slide a (2*half+1)^2-module template around p0, return the best centre
+        let bs = -1, bp = p0;
+        for (let dy = -r; dy <= r + 1e-9; dy += st) for (let dx = -r; dx <= r + 1e-9; dx += st) {
+          const cx = p0[0] + dx * mm, cy = p0[1] + dy * mm; let sc = 0;
+          for (let v = -half; v <= half; v++) for (let u = -half; u <= half; u++) sc += at(cx + u * ux[0] + v * uy[0], cy + u * ux[1] + v * uy[1]) === (dark(Math.max(Math.abs(u), Math.abs(v))) ? 1 : 0) ? 1 : 0;
+          sc -= (Math.abs(dx) + Math.abs(dy)) * .02;                    // on ties stay close to the prediction
+          if (sc > bs) { bs = sc; bp = [cx, cy]; }
+        }
+        return [bp, bs];
+      };
+      const fd = k => k !== 2, ad = k => k !== 1;
+      const fin = p0 => { let [q] = snap(p0, 3, fd, 1, .25); [q] = snap(q, 3, fd, .3, .1); return q; };
+      const P0 = [fin([tl.x, tl.y]), fin([tr.x, tr.y]), fin([bl.x, bl.y])];
+      let br = [P0[1][0] + P0[2][0] - P0[0][0], P0[1][1] + P0[2][1] - P0[0][1]];   // predicted 4th corner (parallelogram)
+      { const k = (N - 10) / (N - 7); br = [P0[0][0] + (br[0] - P0[0][0]) * k, P0[0][1] + (br[1] - P0[0][1]) * k]; }   // alignment pattern sits 3 modules inside it
+      if (ver > 1) { let [q, sc] = snap(br, 2, ad, 2.5, .25); if (sc >= 21) { [q, sc] = snap(q, 2, ad, .3, .1); br = q; } }
+      const H = qrHomography([[3.5, 3.5], [N - 3.5, 3.5], [3.5, N - 3.5], [N - 6.5, N - 6.5]], [P0[0], P0[1], P0[2], br]); if (!H) continue;
+      const sm = m * .28;
+      const txt = qrRead(b, ver, (u, v) => { const [x, y] = H(u, v); return (at(x, y) + at(x + sm, y) + at(x - sm, y) + at(x, y + sm) + at(x, y - sm)) >= 3 ? 1 : 0; });
+      if (txt) return txt;
+    }
+  }
+  return null;
+}
+
+let scan = null;
+function scanClose() { if (!scan) return; scan.on = false; try { scan.stream && scan.stream.getTracks().forEach(t => t.stop()); } catch (e) {} scan.el.remove(); scan = null; }
+function scanFrame(txt) {
+  const m = /^LCP2\.([0-9a-f]{8})\.(\d{1,3})\.(\d{1,3})\.([0-9a-f]{3})\.([A-Za-z0-9_-]*)$/.exec(txt); if (!m || !scan) return false;
+  const [, crc, i, n, chk, chunk] = m, k = +i, tot = +n; if (!tot || tot > 200 || k < 1 || k > tot) return false;
+  if ((crc32(new TextEncoder().encode(chunk)) & 0xFFF).toString(16).padStart(3, '0') !== chk) return false;     // damaged frame: wait for the next loop
+  if (scan.crc !== crc || scan.n !== tot) { scan.crc = crc; scan.n = tot; scan.parts = {}; }
+  if (!scan.parts[k]) { scan.parts[k] = chunk; buzz(8); }
+  const got = Object.keys(scan.parts).length;
+  $('#scdots', scan.el).innerHTML = Array.from({length: tot}, (_, x) => `<i class="${scan.parts[x + 1] ? 'on' : ''}"></i>`).join('');
+  $('#scst', scan.el).textContent = got < tot ? `دریافت شد: ${fmt(got)} از ${fmt(tot)} — دوربین را ثابت نگه دارید` : 'در حال وارد کردن…';
+  if (got === tot) scanDone(crc, tot);
+  return true;
+}
+async function scanDone(crc, tot) {
+  const parts = scan.parts; scanClose();
+  try {
+    let s = ''; for (let i = 1; i <= tot; i++) s += parts[i];
+    const u = b64u(s); if (crc32(u).toString(16).padStart(8, '0') !== crc) return toast('داده‌ی اسکن‌شده خراب بود؛ دوباره اسکن کنید');
+    if (u.length < 80 || u.length > 200064) return toast('اطلاعات QR ناقص یا نامعتبر است');
+    const packed = u.slice(0, -64), sig = u.slice(-64);
+    let note = '';
+    if (LIC_ON) {                                  // activated package: only a QR signed by the workshop program is accepted
+      if (!(window.crypto && crypto.subtle)) return toast('بررسی امضا فقط در آدرس امن (https) ممکن است؛ برنامه را از https باز کنید');
+      let ok = false;
+      try {
+        const key = await crypto.subtle.importKey('raw', hex2b(LIC_PUB), {name: 'ECDSA', namedCurve: 'P-256'}, false, ['verify']);
+        const msg = new Uint8Array(5 + packed.length); msg.set(new TextEncoder().encode('LCPR1')); msg.set(packed, 5);
+        ok = await crypto.subtle.verify({name: 'ECDSA', hash: 'SHA-256'}, key, sig, msg);
+      } catch (e) {}
+      if (!ok) return toast('امضای QR معتبر نیست؛ قیمت‌ها تغییر نکردند');
+      note = '\n(امضای برنامه‌ی کارگاه تأیید شد)';
+    } else note = '\n(نسخه‌ی بدون قفل: امضا بررسی نشد)';
+    const j = JSON.parse(new TextDecoder().decode(inflateZ(packed)));
+    if (!j || j.a !== 'laser-calc' || !Array.isArray(j.m) || !Array.isArray(j.s) || !Array.isArray(j.t)) return toast('این QR مربوط به قیمت‌های ماشین‌حساب نیست');
+    importText(JSON.stringify({app: 'laser-calc',
+      materials: j.m.map(a => ({id: a[0], name: a[1], kind: a[2], thickness: a[3], sheet_l: a[4], sheet_w: a[5], price: a[6], active: 1})),
+      services: j.s.map(a => ({id: a[0], name: a[1], unit: a[2], price: a[3], divisor: a[4], active: 1})),
+      st: {rush_pct: j.t[0], min_order: j.t[1], tax_percent: j.t[2], qty_tiers: j.t[3], round_to: j.t[4]}}), note);
+  } catch (e) { toast('خواندن QR ناموفق بود؛ دوباره اسکن کنید'); }
+}
+async function scanOpen() {
+  scanClose();
+  const el = document.createElement('div'); el.id = 'scan';
+  el.innerHTML = '<video playsinline muted></video><div class="scf"></div><div class="scp"><div id="scst">دوربین را روبه‌روی QR برنامه‌ی کامپیوتر بگیرید</div><div id="scdots"></div><button data-a="scx">بستن</button></div>';
+  document.body.appendChild(el); scan = {el, on: true, parts: {}, n: 0, crc: ''};
+  const me = scan, st = $('#scst', el);
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { st.textContent = 'دوربین فقط در آدرس امن (https) کار می‌کند؛ برنامه را از یک آدرس https باز کنید (یا از «وارد کردن از فایل» استفاده کنید).'; return; }
+  let stream; try { stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: {ideal: 'environment'}, width: {ideal: 1280}, height: {ideal: 720}}, audio: false}); }
+  catch (e) { st.textContent = e && e.name === 'NotAllowedError' ? 'اجازه‌ی دوربین داده نشد؛ در تنظیمات مرورگر اجازه بدهید و دوباره بزنید.' : 'دوربین در دسترس نیست.'; return; }
+  if (scan !== me) { stream.getTracks().forEach(t => t.stop()); return; }
+  me.stream = stream; const v = $('video', el); v.srcObject = stream; try { await v.play(); } catch (e) {}
+  let det = null; try { if ('BarcodeDetector' in window) det = new BarcodeDetector({formats: ['qr_code']}); } catch (e) {}
+  const cv = document.createElement('canvas'), cx = cv.getContext('2d', {willReadFrequently: true});
+  const tick = async () => {
+    if (scan !== me) return;
+    try {
+      if (v.readyState >= 2 && v.videoWidth) {
+        let ok = false;
+        if (det) { try { const r = await det.detect(v); for (const c of r) if (scan === me && scanFrame(c.rawValue)) ok = true; } catch (e) { det = null; } }
+        if (!ok && scan === me) {
+          const k = Math.min(1, 640 / v.videoWidth); cv.width = Math.round(v.videoWidth * k); cv.height = Math.round(v.videoHeight * k);
+          cx.drawImage(v, 0, 0, cv.width, cv.height);
+          const t = qrDecode(cv.width, cv.height, cx.getImageData(0, 0, cv.width, cv.height).data); if (t) scanFrame(t);
+        }
+      }
+    } catch (e) {}
+    if (scan === me) setTimeout(tick, 60);
+  };
+  tick();
+}
 })();
 </script>
 </body>
